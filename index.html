@@ -76,7 +76,7 @@
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-2 flex justify-between items-center"> 
             <div class="flex items-center gap-3">
-                <img src="logo.png" alt="Logo Giro 360 Manaus" class="h-20 w-auto object-contain hover:scale-105 transition-transform duration-300"> 
+                <img src="logo.png" alt="Logo Giro 360 Manaus" class="h-12 md:h-16 w-auto object-contain hover:scale-105 transition-transform duration-300"> 
             </div>
             
             <div class="hidden md:flex space-x-8 text-sm font-medium items-center">
@@ -85,7 +85,17 @@
                 <a href="#beneficios" class="hover:text-yellow-400 transition">Benefícios</a>
                 <a href="#contato" class="px-5 py-2 border border-white rounded-full hover:bg-white hover:text-black transition font-semibold">Fale Conosco</a>
             </div>
-            <button class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+            
+            <button id="mobile-menu-btn" class="md:hidden text-2xl focus:outline-none"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-xl border-t border-gray-800 absolute w-full left-0 top-full shadow-2xl">
+            <div class="flex flex-col p-6 space-y-4 text-center font-medium text-lg">
+                <a href="#inicio" class="mobile-link hover:text-yellow-400 transition py-2 border-b border-gray-800">Início</a>
+                <a href="#como-funciona" class="mobile-link hover:text-yellow-400 transition py-2 border-b border-gray-800">Como Funciona</a>
+                <a href="#beneficios" class="mobile-link hover:text-yellow-400 transition py-2 border-b border-gray-800">Benefícios</a>
+                <a href="#contato" class="mobile-link px-5 py-3 mt-2 bg-white text-black rounded-full hover:bg-gray-200 transition inline-block mx-auto font-bold">Fale Conosco</a>
+            </div>
         </div>
     </nav>
 
@@ -261,24 +271,48 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Inicializa AOS (Animações)
         AOS.init({
             once: true, 
             offset: 100, 
             duration: 800, 
         });
 
-        // Função para dar Play no vídeo e esconder o botão
         function togglePlay() {
             const video = document.getElementById('videoPresentation');
             const btn = document.getElementById('customPlayBtn');
             
             if (video.paused) {
                 video.play();
-                video.controls = true; // Mostra os controles nativos (barra de tempo, volume)
-                btn.classList.add('hidden'); // Esconde o botão de play gigante
+                video.controls = true; 
+                btn.classList.add('hidden'); 
             }
         }
+
+        const btnMobile = document.getElementById('mobile-menu-btn');
+        const menuDiv = document.getElementById('mobile-menu');
+        const linksMobile = document.querySelectorAll('.mobile-link');
+
+        btnMobile.addEventListener('click', () => {
+            menuDiv.classList.toggle('hidden');
+            
+            const icon = btnMobile.querySelector('i');
+            if (menuDiv.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+
+        linksMobile.forEach(link => {
+            link.addEventListener('click', () => {
+                menuDiv.classList.add('hidden');
+                const icon = btnMobile.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            });
+        });
     </script>
 </body>
 </html>
