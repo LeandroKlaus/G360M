@@ -8,8 +8,8 @@ window.addEventListener('load', () => {
     setTimeout(() => {
         gsap.to(loader, {
             yPercent: -100,
-            duration: 1,
-            ease: "power4.inOut"
+            duration: 0.8,
+            ease: "expo.inOut"
         });
         
         initHeroAnimations();
@@ -19,16 +19,18 @@ window.addEventListener('load', () => {
 function initHeroAnimations() {
     gsap.to(".hero-text-anim", {
         y: 0,
-        duration: 1.5,
-        stagger: 0.2,
-        ease: "power4.out",
+        duration: 1.2,
+        stagger: 0.1,
+        ease: "back.out(1.7)",
         delay: 0.2
     });
+    
     gsap.to(".hero-fade-anim", {
         opacity: 1,
         y: 0,
         duration: 1,
-        delay: 1
+        ease: "back.out(1.2)",
+        delay: 0.6
     });
 }
 
@@ -62,7 +64,7 @@ const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 
 let width, height;
-let particles = [];
+let confettis = [];
 
 function resize() {
     width = canvas.width = window.innerWidth;
@@ -71,60 +73,66 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-class Particle {
+class Confetti {
     constructor() {
         this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.z = Math.random() * 2; 
-        this.size = Math.random() * 2;
-        this.color = Math.random() > 0.5 ? '#00f3ff' : '#b026ff'; 
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.y = Math.random() * height - height;
+        
+        const colors = [
+            '#FFD700',
+            '#C0C0C0',
+            '#FF0000',
+            '#0088FF',
+            '#00FF00',
+            '#FFFFFF'
+        ];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        
+        this.w = Math.random() * 8 + 4;
+        this.h = Math.random() * 6 + 3;
+        
+        this.speedY = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 1;
+        
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+        
+        this.oscillationSpeed = Math.random() * 0.05 + 0.01;
+        this.oscillationOffset = Math.random() * 100;
     }
 
-    update(mouseX, mouseY) {
-        this.x += this.speedX;
+    update() {
         this.y += this.speedY;
-
-        const dx = this.x - mouseX;
-        const dy = this.y - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        this.rotation += this.rotationSpeed;
         
-        if (distance < 100) {
-            this.x += dx / 20;
-            this.y += dy / 20;
-        }
+        this.x += Math.sin(this.y * this.oscillationSpeed + this.oscillationOffset) * 0.5 + this.speedX;
 
-        if (this.x < 0) this.x = width;
-        if (this.x > width) this.x = 0;
-        if (this.y < 0) this.y = height;
-        if (this.y > height) this.y = 0;
+        if (this.y > height) {
+            this.y = -20;
+            this.x = Math.random() * width;
+            this.rotation = Math.random() * 360;
+        }
     }
 
     draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
         ctx.fillStyle = this.color;
-        ctx.globalAlpha = 0.6 * this.z; 
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * this.z, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+        
+        ctx.restore();
     }
 }
 
-for (let i = 0; i < 100; i++) particles.push(new Particle());
-
-let mouseX = width / 2;
-let mouseY = height / 2;
-
-window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
+for (let i = 0; i < 150; i++) confettis.push(new Confetti());
 
 function animate() {
     ctx.clearRect(0, 0, width, height);
-    particles.forEach(p => {
-        p.update(mouseX, mouseY);
-        p.draw();
+    confettis.forEach(c => {
+        c.update();
+        c.draw();
     });
     requestAnimationFrame(animate);
 }
@@ -142,10 +150,12 @@ document.querySelectorAll('.tilt-card').forEach(card => {
         const yPct = (y / rect.height) - 0.5;
 
         gsap.to(card, {
-            rotationY: 10 * xPct,
-            rotationX: -10 * yPct,
+            rotationY: 15 * xPct,
+            rotationX: -15 * yPct,
+            scale: 1.05,
             transformPerspective: 500,
-            duration: 0.5
+            duration: 0.4,
+            ease: "power2.out"
         });
     });
 
@@ -153,7 +163,9 @@ document.querySelectorAll('.tilt-card').forEach(card => {
         gsap.to(card, {
             rotationY: 0,
             rotationX: 0,
-            duration: 0.5
+            scale: 1,
+            duration: 0.6,
+            ease: "elastic.out(1, 0.5)"
         });
     });
 });
